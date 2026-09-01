@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSP Solution Architect Portal</title>
+    <style>
+      * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 헤더 스타일 */
+header {
+  background-color: #1a1a2e;
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+header p {
+  font-size: 14px;
+  color: #a0aec0;
+}
+
+/* 메인 컨테이너 */
+.container {
+  flex: 1;
+  max-width: 1000px;
+  margin: 50px auto;
+  padding: 0 20px;
+  width: 100%;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 35px;
+  font-size: 22px;
+  color: #2d3748;
+}
+
+/* 4개 박스 그리드 레이아웃 */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+/* 카드 디자인 및 흔들림 애니메이션 효과 */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 30px 20px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  border-top: 4px solid #3182ce;
+}
+
+.card h3 {
+  font-size: 18px;
+  color: #2d3748;
+  margin-bottom: 12px;
+}
+
+.card p {
+  font-size: 13px;
+  color: #718096;
+  line-height: 1.4;
+}
+
+/* 마우스 오버 시 살짝 흔들리다 멈추는 애니메이션 */
+@keyframes wiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+  75% {
+    transform: rotate(-1deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.card:hover {
+  animation: wiggle 0.4s ease-in-out;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  border-top-color: #2b6cb0;
+}
+
+/* 데이터 조회 결과 영역 */
+.result-container {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+}
+
+.result-container h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #2d3748;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th,
+td {
+  border: 1px solid #e2e8f0;
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  background-color: #f7fafc;
+  color: #4a5568;
+}
+
+/* 푸터 스타일 */
+footer {
+  background-color: #1a1a2e;
+  color: #a0aec0;
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  margin-top: auto;
+}
+
+.btn-load {
+  display: inline-block;
+  background-color: #3182ce;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-load:hover {
+  background-color: #2b6cb0;
+}
+
+    </style>
+  </head>
+  <body>
+    <!-- 헤더 -->
+    <header>
+      <h1>MSP Solution Architect Portal</h1>
+      <p>Hybrid Cloud Architecture & Operations Platform</p>
+    </header>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="container">
+      <h2 class="section-title">주요 메뉴 및 정보</h2>
+
+      <!-- 중앙 4개의 박스 -->
+      <div class="card-grid">
+        <div
+          class="card"
+          onclick="location.href='/company';")
+          "
+        >
+          <h3>회사소개</h3>
+          <p>메가존클라우드<br />클라우드 혁신의 리더</p>
+        </div>
+        <div
+          class="card"
+          onclick="location.href='/docker';"
+        >
+          <h3>도커소개</h3>
+          <p>애플리케이션을 격리하여<br />어디서나 안정적으로 배포</p>
+        </div>
+        <div
+          class="card"
+          onclick="location.href='/student';"
+        >
+          <h3>교육생정보</h3>
+          <p>과정 수강생 및<br />프로젝트 이력 관리</p>
+        </div>
+        <div class="card" onclick="location.href='/score';">
+          <h3>성적등록</h3>
+          <p>데이터베이스 연동<br />성적 및 아이템 조회</p>
+        </div>
+      </div>
+
+      <!-- 데이터베이스 조회 결과 출력 영역 -->
+      <div class="result-container">
+        <h2>데이터베이스 연동 결과</h2>
+        <button class="btn-load" onclick="fetchData()">
+          DB 데이터 가져오기
+        </button>
+        <div id="result" style="margin-top: 15px">
+          <p style="color: #718096; font-size: 14px">
+            버튼을 누르면 MySQL 데이터베이스 테이블 내용이 출력됩니다.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer>
+      <p>
+        &copy; 2026 MegazoneCloud MSP Solution Architect Course. All rights
+        reserved.
+      </p>
+    </footer>
+
+    <script>
+      async function fetchData() {
+  try {
+    const response = await fetch("/loadlist/items");
+    if (!response.ok) throw new Error("서버 응답 실패");
+    const data = await response.json();
+
+    let html =
+      "<table><tr><th>ID</th><th>이름</th><th>과정</th><th>국어</th><th>영어</th><th>수학</th></tr>";
+    data.forEach((item) => {
+      html += `<tr><td>${item.email}</td><td>${item.name}</td><td>${item.class_name}</td><td>${item.kor}</td><td>${item.eng}</td><td>${item.mat}</td></tr>`;
+    });
+    html += "</table>";
+
+    document.getElementById("result").innerHTML = html;
+  } catch (error) {
+    console.error("Error:", error);
+    document.getElementById("result").innerHTML =
+      '<p style="color:e53e3e;">데이터를 불러오는 중 오류가 발생했습니다. (FastAPI 및 DB 상태를 확인하세요)</p>';
+  }
+}
+
+    </script>
+  </body>
+</html>

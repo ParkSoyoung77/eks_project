@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회사소개 - MegazoneCloud</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 정적 웹사이트 표시 배너 */
+        .static-site-banner {
+            background-color: #fef3c7;
+            color: #92400e;
+            text-align: center;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* 헤더 스타일 */
+        header {
+            background-color: #1a1a2e;
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 26px;
+            margin-bottom: 6px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-bottom: 15px;
+        }
+
+        .nav-link {
+            display: inline-block;
+            color: #3182ce;
+            background: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .nav-link:hover {
+            background: #e2e8f0;
+        }
+
+        .container {
+            flex: 1;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 22px;
+            color: #2d3748;
+        }
+
+        .intro-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-top: 4px solid #3182ce;
+        }
+
+        .card h3 {
+            font-size: 18px;
+            color: #2d3748;
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        .highlight-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .highlight-box h3 {
+            font-size: 18px;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-item h4 {
+            font-size: 24px;
+            color: #3182ce;
+            margin-bottom: 5px;
+        }
+
+        .stat-item p {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        footer {
+            background-color: #1a1a2e;
+            color: #a0aec0;
+            text-align: center;
+            padding: 20px;
+            font-size: 13px;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 정적 웹사이트 표시 배너 -->
+    <div class="static-site-banner">
+        ⚡ 이 페이지는 Amazon S3 정적 웹사이트 호스팅으로 제공됩니다.
+    </div>
+
+    <!-- 헤더 -->
+    <header>
+        <h1>MegazoneCloud Company Introduction</h1>
+        <p>대한민국 클라우드 혁신의 리더, 메가존클라우드를 소개합니다</p>
+        <a href="index.html" class="nav-link">&larr; 메인으로 돌아가기</a>
+    </header>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="container">
+        <h2 class="section-title">Cloud Innovation Leader</h2>
+
+        <div class="intro-grid">
+            <div class="card">
+                <h3>기업 개요</h3>
+                <p>메가존클라우드는 국내 최초의 클라우드 전문 기업으로 출발하여, 글로벌 최고 수준의 클라우드 기술력과 노하우를 바탕으로 수많은 기업의 디지털 전환(DX)을 선도하고 있습니다.</p>
+            </div>
+            <div class="card">
+                <h3>핵심 역량</h3>
+                <p>AWS, Google Cloud, Microsoft Azure 등 글로벌 탑티어 클라우드 파트너십을 기반으로 인프라 구축, 마이그레이션, AI/ML 및 데이터 분석까지 엔드투엔드 서비스를 제공합니다.</p>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <h3>메가존클라우드 주요 현황</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h4>2,700+</h4>
+                    <p>임직원 및 전문 인력</p>
+                </div>
+                <div class="stat-item">
+                    <h4>1.5조원+</h4>
+                    <p>연간 클라우드 매출액</p>
+                </div>
+                <div class="stat-item">
+                    <h4>5,000+</h4>
+                    <p>국내외 고객사 레퍼런스</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer>
+        <p>&copy; 2026 MegazoneCloud MSP Solution Architect Course. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

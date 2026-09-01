@@ -1,0 +1,45 @@
+# eks/manifests/deployment.yaml.template
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: std17-test-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: std17-test-nginx
+  template:
+    metadata:
+      labels:
+        app: std17-test-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: ${ECR_REGISTRY}/std17-test-nginx:${IMAGE_TAG}
+          ports:
+            - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: std17-test-fastapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: std17-test-fastapi
+  template:
+    metadata:
+      labels:
+        app: std17-test-fastapi
+    spec:
+      containers:
+        - name: fastapi
+          image: ${ECR_REGISTRY}/std17-test-fastapi:${IMAGE_TAG}
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: std17-test-fastapi-config
+            - secretRef:
+                name: std17-test-fastapi-secret

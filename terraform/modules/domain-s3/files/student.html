@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>교육생 정보 - MSP Solution Architect</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+        background-color: #f4f7f6;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      /* 헤더 스타일 */
+      header {
+        background-color: #1a1a2e;
+        color: white;
+        padding: 25px 20px;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      header h1 {
+        font-size: 26px;
+        margin-bottom: 6px;
+      }
+
+      header p {
+        font-size: 14px;
+        color: #a0aec0;
+        margin-bottom: 15px;
+      }
+
+      .nav-link {
+        display: inline-block;
+        color: #3182ce;
+        background: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: bold;
+        transition: background 0.2s;
+      }
+
+      .nav-link:hover {
+        background: #e2e8f0;
+      }
+
+      /* 메인 컨테이너 */
+      .container {
+        flex: 1;
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+        width: 100%;
+      }
+
+      /* 검색 영역 카드 */
+      .search-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+      }
+
+      .search-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .search-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .search-group label {
+        font-size: 13px;
+        font-weight: bold;
+        color: #4a5568;
+      }
+
+      .search-group select,
+      .search-group input {
+        padding: 10px;
+        border: 1px solid #cbd5e0;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+
+      .btn-search {
+        align-self: flex-end;
+        background-color: #3182ce;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        height: 41px;
+      }
+
+      .btn-search:hover {
+        background-color: #2b6cb0;
+      }
+
+      /* 밑줄 스타일 */
+      hr {
+        border: none;
+        border-top: 2px solid #e2e8f0;
+        margin: 30px 0;
+      }
+
+      /* 결과 리스트 영역 */
+      .result-section {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      .result-section h2 {
+        font-size: 18px;
+        color: #2d3748;
+        margin-bottom: 15px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      th,
+      td {
+        border: 1px solid #e2e8f0;
+        padding: 12px;
+        text-align: left;
+        font-size: 14px;
+      }
+
+      th {
+        background-color: #f7fafc;
+        color: #4a5568;
+      }
+
+      /* 푸터 스타일 */
+      footer {
+        background-color: #1a1a2e;
+        color: #a0aec0;
+        text-align: center;
+        padding: 20px;
+        font-size: 13px;
+        margin-top: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 헤더 -->
+    <header>
+      <h1>MSP Solution Architect Portal</h1>
+      <p>교육생 정보 관리 및 조회</p>
+      <a href="index.html" class="nav-link">&larr; 메인으로 돌아가기</a>
+    </header>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="container">
+      <!-- 상단: 과정 / 이름 / 검색버튼 -->
+      <div class="search-card">
+        <div class="search-form">
+          <div class="search-group">
+            <label for="courseSelect">과정 선택</label>
+            <select id="courseSelect">
+              <option value="msp06">MSP Solution Architect 6기</option>
+              <option value="msp05">MSP Solution Architect 5기</option>
+              <option value="hybrid">Hybrid Cloud Architecture</option>
+            </select>
+          </div>
+          <div class="search-group">
+            <label for="nameInput">이름 검색</label>
+            <input
+              type="text"
+              id="nameInput"
+              placeholder="교육생 이름을 입력하세요"
+            />
+          </div>
+          <button class="btn-search" onclick="searchStudents()">검색</button>
+        </div>
+      </div>
+
+      <!-- 밑줄 -->
+      <hr />
+
+      <!-- 하단: 교육생 정보 리스트 -->
+      <div class="result-section">
+        <h2>교육생 정보 리스트</h2>
+        <div id="studentResult">
+          <table>
+            <thead>
+              <tr>
+                <th>NO</th>
+                <th>과정</th>
+                <th>이름</th>
+                <th>이메일</th>
+                <th>거주지</th>
+              </tr>
+            </thead>
+            <tbody id="studentTableBody">
+              <tr>
+                <td>1</td>
+                <td>MSP Solution Architect 6기</td>
+                <td>신중진 (Ian)</td>
+                <td>aaa@aaa.cloud</td>
+                <td>서울</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>AI로 완성하는 하이브리드 클라우드 아키텍쳐</td>
+                <td>홍길동</td>
+                <td>bbb@bbb.cloud</td>
+                <td>부산</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>AI로 완성하는 하이브리드 클라우드 아키텍쳐</td>
+                <td>이순신</td>
+                <td>수료완료</td>
+                <td>부산</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer>
+      <p>
+        &copy; 2026 MegazoneCloud MSP Solution Architect Course. All rights
+        reserved.
+      </p>
+    </footer>
+
+    <script>
+      function searchStudents() {
+        const course = document.getElementById("courseSelect").value;
+        const name = document.getElementById("nameInput").value.trim();
+
+        // 실제 구현 시 백엔드(FastAPI)와 연동하여 데이터를 가져올 수 있습니다.
+        console.log(`검색 조건 - 과정: ${course}, 이름: ${name}`);
+        alert(
+          `선택한 과정(${course})과 이름(${name || "전체"})으로 검색을 수행합니다.`,
+        );
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+# Web Framework & Server
+fastapi
+uvicorn[standard]
+
+# Database Driver (MySQL 연동)
+pymysql
