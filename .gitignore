@@ -1,0 +1,74 @@
+# 환경변수 파일
+.env
+.env.*
+!.env.example
+
+# 인증서/키 파일
+*.pem
+*.key
+
+# AWS 자격증명 실수 방지
+.aws/
+
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Exclude all .tfvars files, which are likely to contain sensitive data
+*.tfvars
+*.tfvars.json
+
+# Ignore override files as they are usually used to override resources locally
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore transient lock info files created by terraform apply
+.terraform.lock.hcl
+
+# Include override files you do wish to add to version control using negated pattern
+# !example_override.tf
+
+# Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
+*tfplan*
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Ignore Terraform Cloud/Enterprise workspace credentials
+.terraform.tfstate.lock.info
+
+# ==================================================================
+# 모듈화 이후 추가
+# ==================================================================
+
+# 각 모듈 안에도 .terraform/, state 파일이 생길 수 있음 (모듈을 독립 실행할 경우 대비)
+**/modules/**/.terraform/*
+**/modules/**/*.tfstate
+**/modules/**/*.tfstate.*
+
+# state 백업 파일 (terraform apply/state mv 시 자동 생성됨)
+*.tfstate.backup
+
+# state 이관 작업 중 생성되는 임시 plan/백업 파일
+*.tfplan
+*.backup
+
+# 로컬 개발/테스트용 변수 파일 (환경별로 나눴을 때 - dev.tfvars 등은 공유 X)
+*.auto.tfvars
+*.auto.tfvars.json
+
+# macOS / editor junk (선택)
+.DS_Store
+.idea/
+.vscode/
+*.swp
