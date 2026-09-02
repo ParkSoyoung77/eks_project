@@ -1,101 +1,103 @@
-resource "aws_api_gateway_rest_api" "site" {
-  name = "std00-test-site-api"
+# ==================================================================
+# Lambda 배포 패키지 빌드 (pymysql은 기본 런타임에 없으므로 함께 패키징)
+resource "null_resource" "std17_install_lambda_deps" {
+    triggers = {
+        requirements_hash = filemd5("${path.module}/lambda/requirements.txt")
+        source_hash       = filemd5("${path.module}/lambda/lambda-student.py")
+    }
+
+    provisioner "local-exec" {
+        command = "pip install -r ${path.module}/lambda/requirements.txt -t ${path.module}/lambda --upgrade --no-cache-dir --break-system-packages"
+    }
 }
 
-# S3 정적 웹사이트 엔드포인트 (버킷 리전에 맞게 수정)
-locals {
-  s3_website_endpoint = "test.domain.class.s3-website.ap-northeast-3.amazonaws.com"
+data "archive_file" "std17_student_lookup_zip" {
+    type        = "zip"
+    source_dir  = "${path.module}/lambda"
+    output_path = "${path.module}/build/student_lookup.zip"
+    excludes    = ["requirements.txt"]
+
+    depends_on = [null_resource.std17_install_lambda_deps]
 }
 
-# 루트(/) -> index.html
-resource "aws_api_gateway_method" "root_get" {
-  rest_api_id   = aws_api_gateway_rest_api.site.id
-  resource_id   = aws_api_gateway_rest_api.site.root_resource_id
-  http_method   = "GET"
-  authorization = "NONE"
+# ==================================================================
+# IAM 역할 / 권한
+resource "aws_iam_role" "std17_lambda_role" {
+    name = "${var.name_prefix}-lambda-student-role"
+
+    assume_role_policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [{
+            Effect    = "Allow"
+            Principal = { Service = "lambda.amazonaws.com" }
+            Action    = "sts:AssumeRole"
+        }]
+    })
+
+    tags = {
+        Name = "${var.name_prefix}-lambda-student-role"
+    }
 }
 
-resource "aws_api_gateway_integration" "root_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.site.id
-  resource_id             = aws_api_gateway_rest_api.site.root_resource_id
-  http_method             = aws_api_gateway_method.root_get.http_method
-  type                    = "HTTP_PROXY"
-  integration_http_method = "GET"
-  uri                     = "http://${local.s3_website_endpoint}/index.html"
+resource "aws_iam_role_policy_attachment" "std17_lambda_vpc_access" {
+    role       = aws_iam_role.std17_lambda_role.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
-# /company, /student 같은 단일 경로용 모듈화
-resource "aws_api_gateway_resource" "path" {
-  for_each    = toset(["company", "student"])
-  rest_api_id = aws_api_gateway_rest_api.site.id
-  parent_id   = aws_api_gateway_rest_api.site.root_resource_id
-  path_part   = each.value
+resource "aws_iam_role_policy" "std17_lambda_secrets_access" {
+    name = "${var.name_prefix}-lambda-secrets-access"
+    role = aws_iam_role.std17_lambda_role.id
+
+    policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [{
+            Sid      = "Statement1"
+            Effect   = "Allow"
+            Action   = ["secretsmanager:GetSecretValue"]
+            Resource = var.db_secret_arn
+        }]
+    })
 }
 
-resource "aws_api_gateway_method" "path_get" {
-  for_each      = aws_api_gateway_resource.path
-  rest_api_id   = aws_api_gateway_rest_api.site.id
-  resource_id   = each.value.id
-  http_method   = "GET"
-  authorization = "NONE"
+# ==================================================================
+# Lambda 함수
+resource "aws_cloudwatch_log_group" "std17_student_lookup" {
+    name              = "/aws/lambda/${var.name_prefix}-student-lookup"
+    retention_in_days = 7
 }
 
-resource "aws_api_gateway_integration" "path_integration" {
-  for_each                = aws_api_gateway_resource.path
-  rest_api_id             = aws_api_gateway_rest_api.site.id
-  resource_id             = each.value.id
-  http_method             = aws_api_gateway_method.path_get[each.key].http_method
-  type                    = "HTTP_PROXY"
-  integration_http_method = "GET"
-  uri                     = "http://${local.s3_website_endpoint}/${each.key}.html"
-}
+resource "aws_lambda_function" "std17_student_lookup" {
+    function_name = "${var.name_prefix}-student-lookup"
+    role          = aws_iam_role.std17_lambda_role.arn
 
-# /docker/{proxy+} -> S3 /docker/* 하위 모든 파일 (ex-3.zip 안의 여러 html)
-resource "aws_api_gateway_resource" "docker" {
-  rest_api_id = aws_api_gateway_rest_api.site.id
-  parent_id   = aws_api_gateway_rest_api.site.root_resource_id
-  path_part   = "docker"
-}
+    filename         = data.archive_file.std17_student_lookup_zip.output_path
+    source_code_hash = data.archive_file.std17_student_lookup_zip.output_base64sha256
 
-resource "aws_api_gateway_resource" "docker_proxy" {
-  rest_api_id = aws_api_gateway_rest_api.site.id
-  parent_id   = aws_api_gateway_resource.docker.id
-  path_part   = "{proxy+}"
-}
+    handler = "lambda-student.lambda_handler"
+    runtime = "python3.14"
+    timeout = 10
 
-resource "aws_api_gateway_method" "docker_proxy_get" {
-  rest_api_id   = aws_api_gateway_rest_api.site.id
-  resource_id   = aws_api_gateway_resource.docker_proxy.id
-  http_method   = "GET"
-  authorization = "NONE"
-  request_parameters = {
-    "method.request.path.proxy" = true
-  }
-}
+    vpc_config {
+        subnet_ids         = var.private_subnet_ids
+        security_group_ids = [var.security_group_id]
+    }
 
-resource "aws_api_gateway_integration" "docker_proxy_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.site.id
-  resource_id             = aws_api_gateway_resource.docker_proxy.id
-  http_method             = aws_api_gateway_method.docker_proxy_get.http_method
-  type                    = "HTTP_PROXY"
-  integration_http_method = "GET"
-  uri                     = "http://${local.s3_website_endpoint}/docker/{proxy}"
-  request_parameters = {
-    "integration.request.path.proxy" = "method.request.path.proxy"
-  }
-}
+    environment {
+        variables = {
+            DB_SECRET_NAME = var.db_secret_arn
+            DB_HOST        = var.db_host
+            DB_NAME        = var.db_name
+            DB_PORT        = "3306"
+        }
+    }
 
-resource "aws_api_gateway_deployment" "site" {
-  rest_api_id = aws_api_gateway_rest_api.site.id
-  depends_on = [
-    aws_api_gateway_integration.root_integration,
-    aws_api_gateway_integration.path_integration,
-    aws_api_gateway_integration.docker_proxy_integration,
-  ]
-}
+    depends_on = [
+        aws_iam_role_policy_attachment.std17_lambda_vpc_access,
+        aws_iam_role_policy.std17_lambda_secrets_access,
+        aws_cloudwatch_log_group.std17_student_lookup,
+    ]
 
-resource "aws_api_gateway_stage" "prod" {
-  deployment_id = aws_api_gateway_deployment.site.id
-  rest_api_id   = aws_api_gateway_rest_api.site.id
-  stage_name    = "prod"
+    tags = {
+        Name = "${var.name_prefix}-student-lookup"
+    }
 }

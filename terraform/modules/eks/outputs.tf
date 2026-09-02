@@ -1,12 +1,12 @@
-output "cluster_name" {
-    value = aws_eks_cluster.std17_test_eks.name
+output "cluster_id" {
+    value = aws_eks_cluster.std17_test_eks.id
 }
 
 output "cluster_endpoint" {
     value = aws_eks_cluster.std17_test_eks.endpoint
 }
 
-output "cluster_ca_certificate" {
+output "cluster_certificate_authority_data" {
     value = aws_eks_cluster.std17_test_eks.certificate_authority[0].data
 }
 

@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  mysql-container:
+    image: ${ECR_REGISTRY}/std17-test-mysql:latest
+    container_name: mysql-container
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  fastapi:
+    image: ${ECR_REGISTRY}/std17-test-fastapi:ec2
+    container_name: fastapi
+    restart: unless-stopped
+    env_file:
+      - ./fastapi/.env
+    depends_on:
+      - mysql-container
+    networks:
+      - app-network
+
+  nginx:
+    image: ${ECR_REGISTRY}/std17-test-nginx:ec2
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - fastapi
+    networks:
+      - app-network
+
+volumes:
+  mysql-data:
+
+networks:
+  app-network:
+    driver: bridge

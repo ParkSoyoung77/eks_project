@@ -17,7 +17,30 @@ variable "key_name" {
 }
 
 variable "db_name" {
-  description = "생성할 데이터베이스 이름"
-  type        = string
-  default     = "testdb"
+    description = "docker-compose MySQL 컨테이너용 데이터베이스 이름"
+    type        = string
+    default     = "testdb"
+}
+
+variable "name_prefix" {
+    description = "모든 리소스 Name/Tag 접두사"
+    type        = string
+    default     = "std17-test"
+}
+
+variable "domain_name" {
+    description = "루트 도메인"
+    type        = string
+    default     = "sy99.cloud"
+}
+
+variable "site_domain" {
+    description = "item3용 서브도메인"
+    type        = string
+    default     = "test.sy99.cloud"
+}
+
+variable "hosted_zone_id" {
+    description = "sy99.cloud Route53 호스팅 영역 ID"
+    type        = string
 }
