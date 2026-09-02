@@ -1,23 +1,19 @@
 # ==================================================================
-# Lambda 배포 패키지 빌드 (pymysql은 기본 런타임에 없으므로 함께 패키징)
-resource "null_resource" "std17_install_lambda_deps" {
-    triggers = {
-        requirements_hash = filemd5("${path.module}/lambda/requirements.txt")
-        source_hash       = filemd5("${path.module}/lambda/lambda-student.py")
-    }
-
-    provisioner "local-exec" {
-        command = "pip install -r ${path.module}/lambda/requirements.txt -t ${path.module}/lambda --upgrade --no-cache-dir --break-system-packages"
-    }
+# Lambda Layer (pymysql) - 로컬에서 미리 빌드한 zip을 그대로 업로드
+resource "aws_lambda_layer_version" "std17_pymysql_layer" {
+    filename            = "${path.module}/pymysql-layer.zip"
+    layer_name          = "${var.name_prefix}-pymysql-layer"
+    compatible_runtimes = ["python3.14"]
+    source_code_hash    = filebase64sha256("${path.module}/pymysql-layer.zip")
 }
 
+# ==================================================================
+# Lambda 함수 코드 (순수 소스만, pymysql 제외)
 data "archive_file" "std17_student_lookup_zip" {
     type        = "zip"
     source_dir  = "${path.module}/lambda"
     output_path = "${path.module}/build/student_lookup.zip"
     excludes    = ["requirements.txt"]
-
-    depends_on = [null_resource.std17_install_lambda_deps]
 }
 
 # ==================================================================
@@ -76,6 +72,8 @@ resource "aws_lambda_function" "std17_student_lookup" {
     handler = "lambda-student.lambda_handler"
     runtime = "python3.14"
     timeout = 10
+
+    layers = [aws_lambda_layer_version.std17_pymysql_layer.arn]
 
     vpc_config {
         subnet_ids         = var.private_subnet_ids
