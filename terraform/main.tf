@@ -102,12 +102,13 @@ module "api_gateway" {
 # 10. ALB (item 7/8: docker-compose EC2 앞단, HTTPS 리스너)
 # ==================================================================
 module "alb" {
-    source              = "./modules/alb"
-    name_prefix         = var.name_prefix
-    vpc_id              = module.network.vpc_id
-    public_subnet_ids   = module.network.public_subnet_ids
-    security_group_id   = module.security.alb_sg_id
-    acm_certificate_arn = module.acm.certificate_arn
+    source                  = "./modules/alb"
+    name_prefix             = var.name_prefix
+    vpc_id                  = module.network.vpc_id
+    public_subnet_ids       = module.network.public_subnet_ids
+    eks_private_subnet_ids  = module.network.eks_private_subnet_ids
+    security_group_id       = module.security.alb_sg_id
+    acm_certificate_arn     = module.acm.certificate_arn
 }
 
 # ==================================================================

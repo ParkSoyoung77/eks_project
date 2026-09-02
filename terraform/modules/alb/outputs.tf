@@ -15,5 +15,5 @@ output "target_group_arn" {
 
 output "eks_target_group_arn" {
     description = "EKS 타겟그룹 ARN"
-    value = aws_lb_target_group.std17_eks_app_tg.arn
+    value       = aws_lb_target_group.std17_eks_app_tg.arn
 }

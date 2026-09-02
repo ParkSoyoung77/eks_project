@@ -11,6 +11,10 @@ variable "public_subnet_ids" {
     type = list(string)
 }
 
+variable "eks_private_subnet_ids" {
+    type = list(string)
+}
+
 variable "security_group_id" {
     type = string
 }
