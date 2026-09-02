@@ -52,3 +52,13 @@ output "lambda_function_name" {
     description = "item9 Lambda 함수 이름"
     value       = module.lambda.function_name
 }
+
+output "rds_db_secret_arn" {
+    description = "RDS 마스터 계정 Secrets Manager ARN"
+    value       = module.rds.db_secret_arn
+}
+
+output "eks_target_group_arn" {
+    description = "EKS TargetGroupBinding용 ALB 타겟그룹 ARN"
+    value       = module.alb.eks_target_group_arn
+}
