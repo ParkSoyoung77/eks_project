@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: std17-test-fastapi-config
+data:
+  DB_HOST: "__DB_HOST__"
+  DB_NAME: "__DB_NAME__"
+  DB_PORT: "3306"

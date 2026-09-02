@@ -91,7 +91,7 @@ resource "aws_autoscaling_group" "std17_ec2_asg" {
     min_size            = 1
     desired_capacity    = 1
     max_size            = 2
-    vpc_zone_identifier = var.public_subnet_ids
+    vpc_zone_identifier = var.subnet_ids
     target_group_arns   = [var.alb_target_group_arn]
     health_check_type   = "ELB"
 

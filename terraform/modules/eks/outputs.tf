@@ -17,3 +17,11 @@ output "node_security_group_id" {
 output "node_role_arn" {
     value = aws_iam_role.std17_test_eks_node_role.arn
 }
+
+output "alb_controller_role_arn" {
+    value = aws_iam_role.std17_test_alb_controller_role.arn
+}
+
+output "oidc_provider_arn" {
+    value = aws_iam_openid_connect_provider.std17_test_eks_oidc.arn
+}

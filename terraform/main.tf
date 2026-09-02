@@ -93,6 +93,9 @@ module "api_gateway" {
     lambda_function_name = module.lambda.function_name
     acm_certificate_arn  = module.acm.certificate_arn
     hosted_zone_id       = var.hosted_zone_id
+    alb_dns_name         = module.alb.alb_dns_name
+
+    depends_on = [module.alb]
 }
 
 # ==================================================================
@@ -111,16 +114,16 @@ module "alb" {
 # 11. Compute (item 4/7: docker-compose EC2 + ASG, S3 배포 아티팩트 포함)
 # ==================================================================
 module "compute" {
-    source                    = "./modules/compute"
-    name_prefix               = var.name_prefix
-    vpc_id                    = module.network.vpc_id
-    public_subnet_ids         = module.network.public_subnet_ids
-    security_group_id         = module.security.ec2_sg_id
-    ec2_role_name             = module.iam.ec2_role_name
-    instance_profile_name     = module.iam.ec2_instance_profile_name
-    key_name                  = var.key_name
-    ecr_registry              = local.ecr_registry
-    alb_target_group_arn      = module.alb.target_group_arn
+    source                  = "./modules/compute"
+    name_prefix             = var.name_prefix
+    vpc_id                  = module.network.vpc_id
+    subnet_ids              = module.network.private_subnet_ids
+    security_group_id       = module.security.ec2_sg_id
+    ec2_role_name           = module.iam.ec2_role_name
+    instance_profile_name   = module.iam.ec2_instance_profile_name
+    key_name                = var.key_name
+    ecr_registry            = local.ecr_registry
+    alb_target_group_arn    = module.alb.target_group_arn
 
     depends_on = [module.alb, module.iam]
 }
@@ -157,4 +160,46 @@ resource "aws_security_group_rule" "rds_from_ec2" {
     security_group_id        = module.security.rds_sg_id
     source_security_group_id = module.security.ec2_sg_id
     description              = "ec2 to RDS (init.sql 반영용 mysql client)"
+}
+
+# ==================================================================
+# 13. 헬름 설치
+# ==================================================================
+resource "helm_release" "std17_alb_controller" {
+    name       = "aws-load-balancer-controller"
+    repository = "https://aws.github.io/eks-charts"
+    chart      = "aws-load-balancer-controller"
+    namespace  = "kube-system"
+
+    set {
+        name  = "clusterName"
+        value = module.eks.cluster_id
+    }
+
+    set {
+        name  = "serviceAccount.create"
+        value = "true"
+    }
+
+    set {
+        name  = "serviceAccount.name"
+        value = "aws-load-balancer-controller"
+    }
+
+    set {
+        name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+        value = module.eks.alb_controller_role_arn
+    }
+
+    set {
+        name  = "region"
+        value = var.aws_region
+    }
+
+    set {
+        name  = "vpcId"
+        value = module.network.vpc_id
+    }
+
+    depends_on = [module.eks]
 }

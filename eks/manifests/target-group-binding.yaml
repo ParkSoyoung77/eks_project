@@ -1,0 +1,10 @@
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: std17-test-eks-tgb
+spec:
+  serviceRef:
+    name: std17-test-nginx-svc
+    port: 80
+  targetGroupARN: __EKS_TARGET_GROUP_ARN__
+  targetType: ip

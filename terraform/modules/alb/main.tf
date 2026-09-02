@@ -59,3 +59,62 @@ resource "aws_lb_listener" "std17_https" {
         target_group_arn = aws_lb_target_group.std17_ec2_app_tg.arn
     }
 }
+
+
+resource "aws_lb_target_group" "std17_eks_app_tg" {
+    name        = "${var.name_prefix}-eks-tg"
+    port        = 80
+    protocol    = "HTTP"
+    vpc_id      = var.vpc_id
+    target_type = "ip"  # EKS 파드는 IP 타겟
+
+    health_check {
+        path = "/"
+    }
+
+    tags = { Name = "${var.name_prefix}-eks-tg" }
+}
+
+resource "aws_lb_listener_rule" "std17_eks_path" {
+    listener_arn = aws_lb_listener.std17_https.arn
+    priority     = 10
+
+    action {
+        type             = "forward"
+        target_group_arn = aws_lb_target_group.std17_eks_app_tg.arn
+    }
+
+    condition {
+        path_pattern {
+            values = ["/test", "/test/*"]
+        }
+    }
+}
+
+# item8 요건과 무관한 내부 전용 리스너 (API Gateway -> ALB 프록시용, 리다이렉트 없음)
+resource "aws_lb_listener" "std17_internal_proxy" {
+    load_balancer_arn = aws_lb.std17_alb.arn
+    port              = 8080
+    protocol          = "HTTP"
+
+    default_action {
+        type             = "forward"
+        target_group_arn = aws_lb_target_group.std17_ec2_app_tg.arn
+    }
+}
+
+resource "aws_lb_listener_rule" "std17_internal_eks_path" {
+    listener_arn = aws_lb_listener.std17_internal_proxy.arn
+    priority     = 10
+
+    action {
+        type             = "forward"
+        target_group_arn = aws_lb_target_group.std17_eks_app_tg.arn
+    }
+
+    condition {
+        path_pattern {
+            values = ["/test", "/test/*"]
+        }
+    }
+}

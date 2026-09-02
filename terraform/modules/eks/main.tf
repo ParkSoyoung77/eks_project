@@ -270,3 +270,56 @@ resource "aws_eks_access_policy_association" "std17_test_admin_policy" {
 
     depends_on = [aws_eks_access_entry.std17_test_admin_entry]
 }
+
+# ==================================================================
+# OIDC Provider (IRSA용 - ALB Controller가 이걸 통해 AWS API 호출 권한을 받음)
+data "tls_certificate" "std17_test_eks_oidc" {
+    url = aws_eks_cluster.std17_test_eks.identity[0].oidc[0].issuer
+}
+
+resource "aws_iam_openid_connect_provider" "std17_test_eks_oidc" {
+    url             = aws_eks_cluster.std17_test_eks.identity[0].oidc[0].issuer
+    client_id_list  = ["sts.amazonaws.com"]
+    thumbprint_list = [data.tls_certificate.std17_test_eks_oidc.certificates[0].sha1_fingerprint]
+
+    tags = {
+        Name = "${var.name_prefix}-eks-oidc"
+    }
+}
+
+# ==================================================================
+# AWS Load Balancer Controller IRSA 역할
+resource "aws_iam_role" "std17_test_alb_controller_role" {
+    name = "${var.name_prefix}-alb-controller-role"
+
+    assume_role_policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [{
+            Effect = "Allow"
+            Principal = {
+                Federated = aws_iam_openid_connect_provider.std17_test_eks_oidc.arn
+            }
+            Action = "sts:AssumeRoleWithWebIdentity"
+            Condition = {
+                StringEquals = {
+                    "${replace(aws_iam_openid_connect_provider.std17_test_eks_oidc.url, "https://", "")}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
+                    "${replace(aws_iam_openid_connect_provider.std17_test_eks_oidc.url, "https://", "")}:aud" = "sts.amazonaws.com"
+                }
+            }
+        }]
+    })
+
+    tags = {
+        Name = "${var.name_prefix}-alb-controller-role"
+    }
+}
+
+resource "aws_iam_policy" "std17_test_alb_controller_policy" {
+    name   = "${var.name_prefix}-alb-controller-policy"
+    policy = file("${path.module}/policies/alb-controller-iam-policy.json")
+}
+
+resource "aws_iam_role_policy_attachment" "std17_test_alb_controller_attach" {
+    role       = aws_iam_role.std17_test_alb_controller_role.name
+    policy_arn = aws_iam_policy.std17_test_alb_controller_policy.arn
+}

@@ -68,3 +68,8 @@ variable "admin_principal_arns" {
     type        = list(string)
     default     = []
 }
+
+variable "aws_region" {
+    type    = string
+    default = "ap-northeast-3"
+}

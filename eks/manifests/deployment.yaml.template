@@ -1,4 +1,3 @@
-# eks/manifests/deployment.yaml.template
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,6 +17,14 @@ spec:
           image: ${ECR_REGISTRY}/std17-test-nginx:${IMAGE_TAG}
           ports:
             - containerPort: 80
+          volumeMounts:
+            - name: nginx-log
+              mountPath: /var/log/nginx
+      volumes:
+        - name: nginx-log
+          hostPath:
+            path: /var/log/std17-test/nginx
+            type: DirectoryOrCreate
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -43,3 +50,11 @@ spec:
                 name: std17-test-fastapi-config
             - secretRef:
                 name: std17-test-fastapi-secret
+          volumeMounts:
+            - name: fastapi-log
+              mountPath: /var/log/fastapi
+      volumes:
+        - name: fastapi-log
+          hostPath:
+            path: /var/log/std17-test/fastapi
+            type: DirectoryOrCreate
