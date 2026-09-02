@@ -31,6 +31,12 @@ aws s3 cp s3://${deploy_bucket_name}/fastapi.env /home/ubuntu/app/fastapi/.env
 
 chown -R ubuntu:ubuntu /home/ubuntu/app
 
+# ── MySQL root 비밀번호 조회 ────────────────────────
+export MYSQL_ROOT_PASSWORD=$(aws secretsmanager get-secret-value \
+  --secret-id ${mysql_secret_arn} \
+  --region ap-northeast-3 \
+  --query SecretString --output text)
+
 # ── ECR 로그인 및 서비스 기동 ───────────────────────
 aws ecr get-login-password --region ap-northeast-3 | \
   docker login --username AWS --password-stdin ${ecr_registry}

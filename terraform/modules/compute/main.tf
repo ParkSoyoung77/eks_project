@@ -59,6 +59,20 @@ resource "aws_iam_role_policy" "std17_ec2_deploy_bucket_read" {
     })
 }
 
+resource "aws_iam_role_policy" "std17_ec2_secrets_read" {
+    name = "${var.name_prefix}-ec2-secrets-read"
+    role = var.ec2_role_name
+
+    policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [{
+            Effect   = "Allow"
+            Action   = ["secretsmanager:GetSecretValue"]
+            Resource = aws_secretsmanager_secret.std17_mysql_container_root.arn
+        }]
+    })
+}
+
 # ==================================================================
 # 시작 템플릿 / ASG
 resource "aws_launch_template" "std17_ec2_app" {
@@ -76,6 +90,7 @@ resource "aws_launch_template" "std17_ec2_app" {
     user_data = base64encode(templatefile("${path.module}/scripts/user_data.sh", {
     ecr_registry       = var.ecr_registry
     deploy_bucket_name = aws_s3_bucket.std17_deploy_artifacts.id
+    mysql_secret_arn   = aws_secretsmanager_secret.std17_mysql_container_root.arn
     }))
 
     tag_specifications {
@@ -105,4 +120,19 @@ resource "aws_autoscaling_group" "std17_ec2_asg" {
         value               = "${var.name_prefix}-ec2"
         propagate_at_launch = true
     }
+}
+# ==================================================================
+# Secrets Manager로 관리
+resource "random_password" "std17_mysql_container_root" {
+    length  = 20
+    special = false
+}
+
+resource "aws_secretsmanager_secret" "std17_mysql_container_root" {
+    name = "${var.name_prefix}-mysql-container-root-secret"
+}
+
+resource "aws_secretsmanager_secret_version" "std17_mysql_container_root" {
+    secret_id     = aws_secretsmanager_secret.std17_mysql_container_root.id
+    secret_string = random_password.std17_mysql_container_root.result
 }
