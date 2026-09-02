@@ -1,5 +1,6 @@
 import json
 import os
+import time
 import boto3
 import pymysql
 
@@ -34,23 +35,32 @@ def get_connection():
 
 
 def get_students():
-    conn = None
-    try:
-        conn = get_connection()
-        with conn.cursor() as cursor:
-            sql = """
-                SELECT b.email, b.name, b.location, c.class_name
-                FROM tstudent b
-                INNER JOIN tclass c ON b.class_idx = c.idx
-            """
-            cursor.execute(sql)
-            return cursor.fetchall()
-    except Exception as e:
-        print(f"student query failed: {e}")
-        return None
-    finally:
-        if conn:
-            conn.close()
+    retries = 3
+    last_error = None
+
+    while retries > 0:
+        conn = None
+        try:
+            conn = get_connection()
+            with conn.cursor() as cursor:
+                sql = """
+                    SELECT b.email, b.name, b.location, c.class_name
+                    FROM tstudent b
+                    INNER JOIN tclass c ON b.class_idx = c.idx
+                """
+                cursor.execute(sql)
+                return cursor.fetchall()
+        except Exception as e:
+            last_error = e
+            print(f"student query failed (retries left: {retries - 1}): {e}")
+            retries -= 1
+            time.sleep(1)
+        finally:
+            if conn:
+                conn.close()
+
+    print(f"student query permanently failed: {last_error}")
+    return None
 
 
 def lambda_handler(event, context):
