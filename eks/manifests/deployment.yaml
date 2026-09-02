@@ -15,6 +15,7 @@ spec:
       containers:
         - name: nginx
           image: 925047940866.dkr.ecr.ap-northeast-3.amazonaws.com/std17-test-nginx:eks
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           volumeMounts:
@@ -43,6 +44,7 @@ spec:
       containers:
         - name: fastapi
           image: 925047940866.dkr.ecr.ap-northeast-3.amazonaws.com/std17-test-fastapi:eks
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
           envFrom:

@@ -72,3 +72,27 @@ terraform.rc
 .idea/
 .vscode/
 *.swp
+
+# ==================================================================
+# EKS 매니페스트 렌더링 결과물 (템플릿에서 매번 생성되는 산출물)
+# ==================================================================
+
+# envsubst로 생성되는 실제 배포 파일 (secret 값이 치환되어 들어감)
+eks/manifests/deployment.yaml
+eks/manifests/target-group-binding.yaml
+eks/manifests/configmap-rendered.yaml
+eks/manifests/secret-rendered.yaml
+
+# RDS/EKS 초기화 작업용 임시 SQL 파일
+/tmp/init.sql
+/tmp/rds_init.sql
+
+# Lambda 빌드 산출물 (archive_file이 자동 생성)
+**/lambda/build/
+**/lambda/**/*.zip
+
+# pip install -t로 lambda 디렉토리에 설치된 의존성 패키지
+terraform/modules/lambda/lambda/*.dist-info/
+terraform/modules/lambda/lambda/bin/
+terraform/modules/lambda/lambda/*.so
+terraform/modules/lambda/lambda/pymysql/

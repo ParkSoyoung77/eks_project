@@ -149,7 +149,7 @@ resource "aws_security_group_rule" "rds_from_eks_node" {
     to_port                  = 3306
     protocol                 = "tcp"
     security_group_id        = module.security.rds_sg_id
-    source_security_group_id = module.eks.node_security_group_id
+    source_security_group_id = module.eks.cluster_primary_security_group_id
     description              = "eks node to RDS proxy"
 }
 

@@ -15,6 +15,7 @@ spec:
       containers:
         - name: nginx
           image: ${ECR_REGISTRY}/std17-test-nginx:${IMAGE_TAG}
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           volumeMounts:
@@ -43,6 +44,7 @@ spec:
       containers:
         - name: fastapi
           image: ${ECR_REGISTRY}/std17-test-fastapi:${IMAGE_TAG}
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
           envFrom:

@@ -230,96 +230,96 @@
     </footer>
 
     <script>
-        async function loadStudents() {
-            const select = document.getElementById('studentSelect');
-            try {
-                const response = await fetch('/api/students');
-                const students = await response.json();
+    async function loadStudents() {
+        const select = document.getElementById('studentSelect');
+        try {
+            const response = await fetch('/test/api/students');
+            const students = await response.json();
 
-                select.innerHTML = '';
-                students.forEach((s) => {
-                    const option = document.createElement('option');
-                    option.value = s.student_idx;
-                    option.textContent = `${s.name} (${s.class_name})`;
-                    select.appendChild(option);
-                });
-            } catch (e) {
-                select.innerHTML = '<option value="">학생 목록을 불러올 수 없습니다</option>';
-                console.error(e);
-            }
+            select.innerHTML = '';
+            students.forEach((s) => {
+                const option = document.createElement('option');
+                option.value = s.student_idx;
+                option.textContent = `${s.name} (${s.class_name})`;
+                select.appendChild(option);
+            });
+        } catch (e) {
+            select.innerHTML = '<option value="">학생 목록을 불러올 수 없습니다</option>';
+            console.error(e);
+        }
+    }
+
+    async function loadScores() {
+        const tbody = document.getElementById('scoreTableBody');
+        try {
+            const response = await fetch('/test/api/scores');
+            const scores = await response.json();
+
+            tbody.innerHTML = '';
+            scores.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.class_name}</td>
+                    <td>${item.name}</td>
+                    <td>${item.kor}</td>
+                    <td>${item.eng}</td>
+                    <td>${item.mat}</td>
+                    <td>${Number(item.avg).toFixed(1)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (e) {
+            tbody.innerHTML = '<tr><td colspan="7">성적 목록을 불러올 수 없습니다</td></tr>';
+            console.error(e);
+        }
+    }
+
+    async function registerScore() {
+        const studentIdx = document.getElementById('studentSelect').value;
+        const kor = document.getElementById('korInput').value;
+        const eng = document.getElementById('engInput').value;
+        const math = document.getElementById('mathInput').value;
+
+        if (!studentIdx) {
+            alert('학생을 선택해주세요.');
+            return;
+        }
+        if (!kor || !eng || !math) {
+            alert('모든 과목의 점수를 입력해주세요.');
+            return;
         }
 
-        async function loadScores() {
-            const tbody = document.getElementById('scoreTableBody');
-            try {
-                const response = await fetch('/api/scores');
-                const scores = await response.json();
+        try {
+            const response = await fetch('/test/api/scores', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    student_idx: Number(studentIdx),
+                    kor: Number(kor),
+                    eng: Number(eng),
+                    mat: Number(math),
+                }),
+            });
 
-                tbody.innerHTML = '';
-                scores.forEach((item, index) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${index + 1}</td>
-                        <td>${item.class_name}</td>
-                        <td>${item.name}</td>
-                        <td>${item.kor}</td>
-                        <td>${item.eng}</td>
-                        <td>${item.mat}</td>
-                        <td>${Number(item.avg).toFixed(1)}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            } catch (e) {
-                tbody.innerHTML = '<tr><td colspan="7">성적 목록을 불러올 수 없습니다</td></tr>';
-                console.error(e);
+            if (!response.ok) {
+                throw new Error('등록 실패');
             }
+
+            alert('성적이 등록되었습니다.');
+            document.getElementById('korInput').value = '';
+            document.getElementById('engInput').value = '';
+            document.getElementById('mathInput').value = '';
+
+            loadScores();
+        } catch (e) {
+            alert('성적 등록 중 오류가 발생했습니다.');
+            console.error(e);
         }
+      }
 
-        async function registerScore() {
-            const studentIdx = document.getElementById('studentSelect').value;
-            const kor = document.getElementById('korInput').value;
-            const eng = document.getElementById('engInput').value;
-            const math = document.getElementById('mathInput').value;
-
-            if (!studentIdx) {
-                alert('학생을 선택해주세요.');
-                return;
-            }
-            if (!kor || !eng || !math) {
-                alert('모든 과목의 점수를 입력해주세요.');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/scores', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        student_idx: Number(studentIdx),
-                        kor: Number(kor),
-                        eng: Number(eng),
-                        mat: Number(math),
-                    }),
-                });
-
-                if (!response.ok) {
-                    throw new Error('등록 실패');
-                }
-
-                alert('성적이 등록되었습니다.');
-                document.getElementById('korInput').value = '';
-                document.getElementById('engInput').value = '';
-                document.getElementById('mathInput').value = '';
-
-                loadScores();
-            } catch (e) {
-                alert('성적 등록 중 오류가 발생했습니다.');
-                console.error(e);
-            }
-        }
-
-        loadStudents();
-        loadScores();
+      loadStudents();
+      loadScores();
     </script>
 </body>
 </html>
