@@ -161,6 +161,30 @@ resource "aws_api_gateway_integration" "std17_root_get" {
 }
 
 # ==================================================================
+# /index.html -> 메인 화면과 동일하게 처리 (파일명 직접 접근 대응)
+resource "aws_api_gateway_resource" "std17_index_html" {
+    rest_api_id = aws_api_gateway_rest_api.std17_site_api.id
+    parent_id   = aws_api_gateway_rest_api.std17_site_api.root_resource_id
+    path_part   = "index.html"
+}
+
+resource "aws_api_gateway_method" "std17_index_html_get" {
+    rest_api_id   = aws_api_gateway_rest_api.std17_site_api.id
+    resource_id   = aws_api_gateway_resource.std17_index_html.id
+    http_method   = "GET"
+    authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "std17_index_html_get" {
+    rest_api_id             = aws_api_gateway_rest_api.std17_site_api.id
+    resource_id             = aws_api_gateway_resource.std17_index_html.id
+    http_method             = aws_api_gateway_method.std17_index_html_get.http_method
+    type                    = "HTTP_PROXY"
+    integration_http_method = "GET"
+    uri                     = "http://${var.alb_dns_name}:8080/"
+}
+
+# ==================================================================
 # /test -> ALB -> EKS 타겟그룹 (item11 성적등록)
 resource "aws_api_gateway_resource" "std17_test" {
     rest_api_id = aws_api_gateway_rest_api.std17_site_api.id
@@ -319,6 +343,7 @@ resource "aws_api_gateway_deployment" "std17_site_api" {
             aws_api_gateway_resource.std17_docker_proxy.id,
             aws_api_gateway_resource.std17_api.id,
             aws_api_gateway_resource.std17_api_students.id,
+            aws_api_gateway_resource.std17_index_html.id,
             aws_api_gateway_resource.std17_test.id,
             aws_api_gateway_resource.std17_test_proxy.id,
             aws_api_gateway_resource.std17_score.id,
@@ -331,6 +356,7 @@ resource "aws_api_gateway_deployment" "std17_site_api" {
             aws_api_gateway_integration.std17_docker_proxy_get.id,
             aws_api_gateway_integration.std17_api_students_get.id,
             aws_api_gateway_integration.std17_root_get.id,
+            aws_api_gateway_integration.std17_index_html_get.id,
             aws_api_gateway_integration.std17_test_get.id,
             aws_api_gateway_integration.std17_test_proxy_get.id,
             aws_api_gateway_integration.std17_score_get.id,
@@ -346,6 +372,7 @@ resource "aws_api_gateway_deployment" "std17_site_api" {
         aws_api_gateway_integration.std17_docker_proxy_get,
         aws_api_gateway_integration.std17_api_students_get,
         aws_api_gateway_integration.std17_root_get,
+        aws_api_gateway_integration.std17_index_html_get,
         aws_api_gateway_integration.std17_test_get,
         aws_api_gateway_integration.std17_test_proxy_get,
         aws_api_gateway_integration.std17_score_get,
