@@ -96,3 +96,7 @@ terraform/modules/lambda/lambda/*.dist-info/
 terraform/modules/lambda/lambda/bin/
 terraform/modules/lambda/lambda/*.so
 terraform/modules/lambda/lambda/pymysql/
+terraform/modules/lambda/layer/
+
+# 단, pymysql Lambda Layer용 zip은 실제로 커밋해야 하는 산출물이므로 예외 처리
+!terraform/modules/lambda/pymysql-layer.zip
