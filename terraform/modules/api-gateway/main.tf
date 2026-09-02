@@ -311,6 +311,34 @@ resource "aws_api_gateway_integration" "std17_loadlist_proxy_get" {
 resource "aws_api_gateway_deployment" "std17_site_api" {
     rest_api_id = aws_api_gateway_rest_api.std17_site_api.id
 
+    triggers = {
+        redeployment = sha1(jsonencode([
+            aws_api_gateway_resource.std17_company.id,
+            aws_api_gateway_resource.std17_student.id,
+            aws_api_gateway_resource.std17_docker.id,
+            aws_api_gateway_resource.std17_docker_proxy.id,
+            aws_api_gateway_resource.std17_api.id,
+            aws_api_gateway_resource.std17_api_students.id,
+            aws_api_gateway_resource.std17_test.id,
+            aws_api_gateway_resource.std17_test_proxy.id,
+            aws_api_gateway_resource.std17_score.id,
+            aws_api_gateway_resource.std17_score_proxy.id,
+            aws_api_gateway_resource.std17_loadlist.id,
+            aws_api_gateway_resource.std17_loadlist_proxy.id,
+            aws_api_gateway_integration.std17_company_get.id,
+            aws_api_gateway_integration.std17_student_get.id,
+            aws_api_gateway_integration.std17_docker_get.id,
+            aws_api_gateway_integration.std17_docker_proxy_get.id,
+            aws_api_gateway_integration.std17_api_students_get.id,
+            aws_api_gateway_integration.std17_root_get.id,
+            aws_api_gateway_integration.std17_test_get.id,
+            aws_api_gateway_integration.std17_test_proxy_get.id,
+            aws_api_gateway_integration.std17_score_get.id,
+            aws_api_gateway_integration.std17_score_proxy_get.id,
+            aws_api_gateway_integration.std17_loadlist_proxy_get.id,
+        ]))
+    }
+
     depends_on = [
         aws_api_gateway_integration.std17_company_get,
         aws_api_gateway_integration.std17_student_get,
