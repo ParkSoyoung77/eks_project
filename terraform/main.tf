@@ -163,8 +163,18 @@ resource "aws_security_group_rule" "rds_from_ec2" {
     description              = "ec2 to RDS for init.sql via mysql client"
 }
 
+resource "aws_security_group_rule" "eks_node_from_alb" {
+    type                     = "ingress"
+    from_port                = 80
+    to_port                  = 80
+    protocol                 = "tcp"
+    security_group_id        = module.eks.node_security_group_id
+    source_security_group_id = module.security.alb_sg_id
+    description              = "alb health check and traffic to eks nginx pods"
+}
+
 # ==================================================================
-# 13. 헬름 설치
+# 14. 헬름 설치
 # ==================================================================
 resource "helm_release" "std17_alb_controller" {
     name       = "aws-load-balancer-controller"

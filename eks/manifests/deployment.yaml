@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: std17-test-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: std17-test-nginx
+  template:
+    metadata:
+      labels:
+        app: std17-test-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: 925047940866.dkr.ecr.ap-northeast-3.amazonaws.com/std17-test-nginx:eks
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-log
+              mountPath: /var/log/nginx
+      volumes:
+        - name: nginx-log
+          hostPath:
+            path: /var/log/std17-test/nginx
+            type: DirectoryOrCreate
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: std17-test-fastapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: std17-test-fastapi
+  template:
+    metadata:
+      labels:
+        app: std17-test-fastapi
+    spec:
+      containers:
+        - name: fastapi
+          image: 925047940866.dkr.ecr.ap-northeast-3.amazonaws.com/std17-test-fastapi:eks
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: std17-test-fastapi-config
+            - secretRef:
+                name: std17-test-fastapi-secret
+          volumeMounts:
+            - name: fastapi-log
+              mountPath: /var/log/fastapi
+      volumes:
+        - name: fastapi-log
+          hostPath:
+            path: /var/log/std17-test/fastapi
+            type: DirectoryOrCreate
