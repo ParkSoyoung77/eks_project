@@ -215,6 +215,44 @@ resource "aws_api_gateway_integration" "std17_test_proxy_get" {
 }
 
 # ==================================================================
+# /loadlist/{proxy+} -> ALB -> EC2 (index.html의 DB 데이터 가져오기)
+resource "aws_api_gateway_resource" "std17_loadlist" {
+    rest_api_id = aws_api_gateway_rest_api.std17_site_api.id
+    parent_id   = aws_api_gateway_rest_api.std17_site_api.root_resource_id
+    path_part   = "loadlist"
+}
+
+resource "aws_api_gateway_resource" "std17_loadlist_proxy" {
+    rest_api_id = aws_api_gateway_rest_api.std17_site_api.id
+    parent_id   = aws_api_gateway_resource.std17_loadlist.id
+    path_part   = "{proxy+}"
+}
+
+resource "aws_api_gateway_method" "std17_loadlist_proxy_get" {
+    rest_api_id   = aws_api_gateway_rest_api.std17_site_api.id
+    resource_id   = aws_api_gateway_resource.std17_loadlist_proxy.id
+    http_method   = "GET"
+    authorization = "NONE"
+
+    request_parameters = {
+        "method.request.path.proxy" = true
+    }
+}
+
+resource "aws_api_gateway_integration" "std17_loadlist_proxy_get" {
+    rest_api_id             = aws_api_gateway_rest_api.std17_site_api.id
+    resource_id             = aws_api_gateway_resource.std17_loadlist_proxy.id
+    http_method             = aws_api_gateway_method.std17_loadlist_proxy_get.http_method
+    type                    = "HTTP_PROXY"
+    integration_http_method = "GET"
+    uri                     = "http://${var.alb_dns_name}:8080/loadlist/{proxy}"
+
+    request_parameters = {
+        "integration.request.path.proxy" = "method.request.path.proxy"
+    }
+}
+
+# ==================================================================
 # 배포 / 스테이지 / 커스텀 도메인
 resource "aws_api_gateway_deployment" "std17_site_api" {
     rest_api_id = aws_api_gateway_rest_api.std17_site_api.id
@@ -228,6 +266,7 @@ resource "aws_api_gateway_deployment" "std17_site_api" {
         aws_api_gateway_integration.std17_root_get,
         aws_api_gateway_integration.std17_test_get,
         aws_api_gateway_integration.std17_test_proxy_get,
+        aws_api_gateway_integration.std17_loadlist_proxy_get,
     ]
 
     lifecycle {
