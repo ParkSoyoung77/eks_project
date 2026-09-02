@@ -102,13 +102,12 @@ module "api_gateway" {
 # 10. ALB (item 7/8: docker-compose EC2 앞단, HTTPS 리스너)
 # ==================================================================
 module "alb" {
-    source                  = "./modules/alb"
-    name_prefix             = var.name_prefix
-    vpc_id                  = module.network.vpc_id
-    public_subnet_ids       = module.network.public_subnet_ids
-    eks_private_subnet_ids  = module.network.eks_private_subnet_ids
-    security_group_id       = module.security.alb_sg_id
-    acm_certificate_arn     = module.acm.certificate_arn
+    source              = "./modules/alb"
+    name_prefix         = var.name_prefix
+    vpc_id              = module.network.vpc_id
+    public_subnet_ids   = module.network.public_subnet_ids
+    security_group_id   = module.security.alb_sg_id
+    acm_certificate_arn = module.acm.certificate_arn
 }
 
 # ==================================================================
@@ -166,12 +165,12 @@ resource "aws_security_group_rule" "rds_from_ec2" {
 
 resource "aws_security_group_rule" "eks_node_from_alb" {
     type                     = "ingress"
-    from_port                = 80
-    to_port                  = 80
+    from_port                = 30080
+    to_port                  = 30080
     protocol                 = "tcp"
     security_group_id        = module.eks.node_security_group_id
     source_security_group_id = module.security.alb_sg_id
-    description              = "alb health check and traffic to eks nginx pods"
+    description              = "alb health check and traffic to eks nginx nodeport"
 }
 
 # ==================================================================

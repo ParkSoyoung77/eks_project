@@ -3,7 +3,7 @@ resource "aws_lb" "std17_alb" {
     internal           = false
     load_balancer_type = "application"
     security_groups    = [var.security_group_id]
-    subnets            = concat(var.public_subnet_ids, var.eks_private_subnet_ids)
+    subnets            = var.public_subnet_ids
 
     tags = {
         Name = "${var.name_prefix}-alb"
@@ -30,7 +30,6 @@ resource "aws_lb_target_group" "std17_ec2_app_tg" {
     }
 }
 
-# item8: HTTP -> HTTPS 리다이렉트
 resource "aws_lb_listener" "std17_http" {
     load_balancer_arn = aws_lb.std17_alb.arn
     port              = 80
@@ -46,7 +45,6 @@ resource "aws_lb_listener" "std17_http" {
     }
 }
 
-# item8: HTTPS 리스너
 resource "aws_lb_listener" "std17_https" {
     load_balancer_arn = aws_lb.std17_alb.arn
     port              = 443
@@ -60,8 +58,6 @@ resource "aws_lb_listener" "std17_https" {
     }
 }
 
-# ==================================================================
-# 내부 전용 리스너 (API Gateway -> ALB 프록시용, 리다이렉트 없음)
 resource "aws_lb_listener" "std17_internal_proxy" {
     load_balancer_arn = aws_lb.std17_alb.arn
     port              = 8080
@@ -90,16 +86,17 @@ resource "aws_lb_listener_rule" "std17_internal_eks_path" {
 }
 
 # ==================================================================
-# EKS 전용 타겟그룹 (item11 성적등록, target_type=ip)
+# EKS 전용 타겟그룹 (instance 타겟, NodePort 30080)
 resource "aws_lb_target_group" "std17_eks_app_tg" {
     name        = "${var.name_prefix}-eks-tg"
-    port        = 80
+    port        = 30080
     protocol    = "HTTP"
     vpc_id      = var.vpc_id
-    target_type = "ip"
+    target_type = "instance"
 
     health_check {
         path = "/"
+        port = "30080"
     }
 
     tags = { Name = "${var.name_prefix}-eks-tg" }
