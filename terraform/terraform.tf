@@ -16,9 +16,9 @@ terraform {
         }
     }
     cloud {
-        organization = "terraform_code_test"
+        organization = "eks_project"
         workspaces {
-            name = "terraform-test"
+            name = "project"
         }
     }
 }
