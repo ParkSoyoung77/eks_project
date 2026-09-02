@@ -238,6 +238,30 @@ resource "aws_api_gateway_integration" "std17_test_proxy_get" {
     }
 }
 
+resource "aws_api_gateway_method" "std17_test_proxy_post" {
+    rest_api_id   = aws_api_gateway_rest_api.std17_site_api.id
+    resource_id   = aws_api_gateway_resource.std17_test_proxy.id
+    http_method   = "POST"
+    authorization = "NONE"
+
+    request_parameters = {
+        "method.request.path.proxy" = true
+    }
+}
+
+resource "aws_api_gateway_integration" "std17_test_proxy_post" {
+    rest_api_id             = aws_api_gateway_rest_api.std17_site_api.id
+    resource_id             = aws_api_gateway_resource.std17_test_proxy.id
+    http_method             = aws_api_gateway_method.std17_test_proxy_post.http_method
+    type                    = "HTTP_PROXY"
+    integration_http_method = "POST"
+    uri                     = "http://${var.alb_dns_name}:8080/test/{proxy}"
+
+    request_parameters = {
+        "integration.request.path.proxy" = "method.request.path.proxy"
+    }
+}
+
 # ==================================================================
 # /score -> ALB -> EKS 타겟그룹 (index.html의 "성적등록" 카드 링크 그대로 사용)
 resource "aws_api_gateway_resource" "std17_score" {
@@ -285,6 +309,30 @@ resource "aws_api_gateway_integration" "std17_score_proxy_get" {
     http_method             = aws_api_gateway_method.std17_score_proxy_get.http_method
     type                    = "HTTP_PROXY"
     integration_http_method = "GET"
+    uri                     = "http://${var.alb_dns_name}:8080/test/{proxy}"
+
+    request_parameters = {
+        "integration.request.path.proxy" = "method.request.path.proxy"
+    }
+}
+
+resource "aws_api_gateway_method" "std17_score_proxy_post" {
+    rest_api_id   = aws_api_gateway_rest_api.std17_site_api.id
+    resource_id   = aws_api_gateway_resource.std17_score_proxy.id
+    http_method   = "POST"
+    authorization = "NONE"
+
+    request_parameters = {
+        "method.request.path.proxy" = true
+    }
+}
+
+resource "aws_api_gateway_integration" "std17_score_proxy_post" {
+    rest_api_id             = aws_api_gateway_rest_api.std17_site_api.id
+    resource_id             = aws_api_gateway_resource.std17_score_proxy.id
+    http_method             = aws_api_gateway_method.std17_score_proxy_post.http_method
+    type                    = "HTTP_PROXY"
+    integration_http_method = "POST"
     uri                     = "http://${var.alb_dns_name}:8080/test/{proxy}"
 
     request_parameters = {
@@ -359,8 +407,10 @@ resource "aws_api_gateway_deployment" "std17_site_api" {
             aws_api_gateway_integration.std17_index_html_get.id,
             aws_api_gateway_integration.std17_test_get.id,
             aws_api_gateway_integration.std17_test_proxy_get.id,
+            aws_api_gateway_integration.std17_test_proxy_post.id,
             aws_api_gateway_integration.std17_score_get.id,
             aws_api_gateway_integration.std17_score_proxy_get.id,
+            aws_api_gateway_integration.std17_score_proxy_post.id,
             aws_api_gateway_integration.std17_loadlist_proxy_get.id,
         ]))
     }
@@ -375,8 +425,10 @@ resource "aws_api_gateway_deployment" "std17_site_api" {
         aws_api_gateway_integration.std17_index_html_get,
         aws_api_gateway_integration.std17_test_get,
         aws_api_gateway_integration.std17_test_proxy_get,
+        aws_api_gateway_integration.std17_test_proxy_post,
         aws_api_gateway_integration.std17_score_get,
         aws_api_gateway_integration.std17_score_proxy_get,
+        aws_api_gateway_integration.std17_score_proxy_post,
         aws_api_gateway_integration.std17_loadlist_proxy_get,
     ]
 
