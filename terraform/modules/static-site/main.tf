@@ -40,6 +40,7 @@ resource "aws_s3_bucket_policy" "std17_static_site_1" {
             Resource  = "${aws_s3_bucket.std17_static_site_1.arn}/*"
         }]
     })
+    depends_on = [aws_s3_bucket_public_access_block.std17_static_site_1]
 }
 
 resource "aws_s3_object" "std17_static_site_1_index" {
@@ -87,6 +88,7 @@ resource "aws_s3_bucket_policy" "std17_static_site_2" {
             Resource  = "${aws_s3_bucket.std17_static_site_2.arn}/*"
         }]
     })
+    depends_on = [aws_s3_bucket_public_access_block.std17_static_site_2]
 }
 
 resource "aws_s3_object" "std17_static_site_2_index" {

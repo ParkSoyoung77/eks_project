@@ -48,6 +48,7 @@ resource "aws_s3_bucket_policy" "std17_site_bucket" {
             Resource  = "${aws_s3_bucket.std17_site_bucket.arn}/*"
         }]
     })
+    depends_on = [aws_s3_bucket_public_access_block.std17_site_bucket]
 }
 
 # ==================================================================

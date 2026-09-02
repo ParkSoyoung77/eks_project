@@ -83,7 +83,7 @@ resource "aws_security_group" "std17_rds_sg" {
 resource "aws_security_group" "std17_lambda_sg" {
     name        = "${var.name_prefix}-lambda-sg"
     vpc_id      = var.vpc_id
-    description = "Lambda SG - RDS Proxy 접근용"
+    description = "Lambda SG - RDS Proxy"
 
     egress {
         from_port   = 0
