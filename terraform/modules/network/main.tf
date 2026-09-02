@@ -147,7 +147,7 @@ data "aws_region" "current" {}
 
 resource "aws_vpc_endpoint" "std17_s3_gateway" {
     vpc_id            = aws_vpc.std17_vpc.id
-    service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
+    service_name = "com.amazonaws.${data.aws_region.current.region}.s3"
     vpc_endpoint_type = "Gateway"
 
     route_table_ids = [

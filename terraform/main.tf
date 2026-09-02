@@ -133,6 +133,7 @@ module "compute" {
 # ==================================================================
 module "eks" {
     source              = "./modules/eks"
+    name_prefix         = var.name_prefix
     vpc_id              = module.network.vpc_id
     private_subnet_ids  = module.network.eks_private_subnet_ids
     cluster_name        = "${var.name_prefix}-eks-cluster"
@@ -159,7 +160,7 @@ resource "aws_security_group_rule" "rds_from_ec2" {
     protocol                 = "tcp"
     security_group_id        = module.security.rds_sg_id
     source_security_group_id = module.security.ec2_sg_id
-    description              = "ec2 to RDS (init.sql 반영용 mysql client)"
+    description              = "ec2 to RDS for init.sql via mysql client"
 }
 
 # ==================================================================

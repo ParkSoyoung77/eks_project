@@ -1,3 +1,8 @@
+variable "name_prefix" {
+    type    = string
+    default = "std17-test"
+}
+
 variable "vpc_id" {
     description = "EKS 클러스터가 속할 VPC ID"
     type        = string
